@@ -10,7 +10,7 @@
    ```powershell
    function Get-Example {
        [CmdletBinding()]
-       param() 
+       param()
        process { "Hello" }
    }
    ```
@@ -31,6 +31,9 @@
 2. **2.2** Document every parameter with `.PARAMETER Name` and a clear description.
    *Note:* Ensures each `param()` entry is self-explanatory when viewed via help.
 
+3. **2.3** Use the universal placeholder GUID format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` in example blocks instead of fake or real GUIDs.
+   *Note:* Prevents security-linting tools from flagging example GUIDs.
+
 ---
 
 ## 3. Parameter Block
@@ -50,8 +53,10 @@
 5. **3.5** Optional parameters: `[Parameter()]` and default value immediately after the name.
    *Note:* Makes it explicit which parameters are optional and their defaults.
 
-6. **3.6** Declare the type in square brackets (e.g. `[string]`, `[int]`, `[string[]]`).
-   *Note:* Strong typing helps catch errors early.
+6. \$1
+
+7. **3.7** Parameter names must use PascalCase.
+   *Note:* Ensures consistency with PowerShell parameter naming conventions.
 
 ---
 
@@ -59,6 +64,15 @@
 
 1. **4.1** Function names use PascalCase with a verb-noun pair (e.g. `Initialize-ArtifactFeed`).
    *Note:* Follows PowerShell’s Verb-Noun convention for discoverability.
+
+2. **4.2** Use approved verbs in function names. Note: Use `Get-Verb` to select an approved verb (e.g., Get-UserAccount).
+   *Note:* Ensures consistency with PowerShell’s built-in cmdlets.
+
+3. **4.3** Ensure function names clearly describe the action and the target. Note: Use specific PascalCase nouns (e.g., `Get-User` vs `Get-Users`).
+   *Note:* Improves clarity for users and maintainers.
+
+4. **4.4** Use singular nouns for cmdlet names unless returning multiple items.
+   *Note:* Prefer singular noun for commands returning a single object.
 
 ---
 
@@ -173,6 +187,18 @@
 2. **13.2** Wrap module imports in try/catch and rethrow to fail the pipeline.
    *Note:* Ensures upstream errors propagate correctly.
 
+3. **13.3** Set `$ErrorActionPreference = 'Stop'` at script start and wrap code in `try/catch` blocks to handle exceptions explicitly.
+   *Note:* Ensures all errors trigger catch logic.
+
+4. **13.4** Use `Write-Error` for non-terminating error messages and reserve `throw` for truly terminating exceptions.
+   *Note:* Ensures errors are emitted on the correct stream and avoids unintended pipeline breaks.
+
+5. **13.5** Never throw string literals; instead throw exception objects or rethrow the original exception.
+   *Note:* Preserves the stack trace and full exception context for accurate debugging.
+
+6. **13.6** Avoid placing terminating `throw` statements inside a `try` block that is immediately caught by a surrounding `catch`; structure error handling so exceptions propagate as intended.
+   *Note:* Prevents errors from being inadvertently swallowed and ensures proper error propagation.
+
 ---
 
 ## 14. Splatting
@@ -203,6 +229,11 @@
 2. **16.2** Break long URLs into concatenations or variables with inline comments.
    *Note:* Prevents overly long lines and clarifies URL segments.
 
+3. \$1
+
+4. **16.4** Avoid using bracket characters in literal output strings.
+   *Note:* Prevents confusion with array or type syntax and variable expansion.
+
 ---
 
 ## 17. Output Verbosity
@@ -212,6 +243,9 @@
 
 2. **17.2** Use `Write-Host` inside pipeline groups for high-level progress.
    *Note:* Ensures key milestones are always visible.
+
+3. **17.3** Avoid using square brackets in literal output messages (e.g., Write-Host).
+   *Note:* Prevents confusion with variable or array syntax.
 
 ---
 
@@ -246,11 +280,18 @@
 4. **20.4** One statement per line.
    *Note:* Simplifies debugging and version control diffs.
 
+5. \$1
+
+6. **20.6** Remove any commented-out code blocks before committing.
+   *Note:* Keeps codebase clean and relies on version control history instead of commented code.
+
 ---
 
 ## 21. Script Prerequisites
 
 1. **21.1** Use `#Requires` statements at the top to define environment prerequisites. Note: Use `#Requires -PSEdition Desktop` and `#Requires -Modules Az` to fail fast when conditions aren't met.
+
+---
 
 ## References
 
@@ -258,17 +299,3 @@
 * [Cmdlet & Script Development Guidelines](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/strongly-encouraged-development-guidelines)
 * [PoshCode PowerShell Practice & Style](https://github.com/PoshCode/PowerShellPracticeAndStyle)
 * [PowerShell Community Style Guide](https://learn.microsoft.com/en-us/powershell/scripting/community/contributing/powershell-style-guide)
-
-2. **4.2** Use approved verbs in function names. Note: Use `Get-Verb` to select an approved verb (e.g., Get-UserAccount).
-
-3. **4.3** Ensure function names clearly describe the action and the target. Note: Use specific PascalCase nouns (e.g., `Get-User` vs `Get-Users`).
-
-4. **4.4** Use singular nouns for cmdlet names unless returning multiple items. Note: Prefer singular noun for commands returning a single object.
-
-5. **3.7** Use validation attributes like `[ValidateSet()]`, `[ValidateRange()]`, etc., to constrain parameter input. Note: `[ValidateSet('Start','Stop')]` restricts choices.
-
-6. **3.8** Prefer fully qualified .NET types for parameters (e.g., `[System.String]`) to prevent alias hijacking. Note: Use `[System.String]$Name` instead of `[string]$Name`.
-
-7. **3.9** Support pipeline input with `[Parameter(ValueFromPipeline=$true)]` or `[Parameter(ValueFromPipelineByPropertyName=$true)]`. Note: Allows passing objects via the pipeline.
-
-8. **13.3** Set `$ErrorActionPreference = 'Stop'` at script start and wrap code in `try/catch` blocks to handle exceptions explicitly. Note: Ensures all errors trigger catch logic.
